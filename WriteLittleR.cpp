@@ -15,6 +15,7 @@ OBSERVATIONFIELD MissingField;
 MEASUREMENT *BlankMeasure;
 short i;
 OBSERVATIONREPORT *ObsReport;
+int ncount;
 
 if(argc!=3)
 {
@@ -77,10 +78,11 @@ sprintf(DefaultStationLoc.ID, "%s",CloudTraceWindData->SubHeader->SatelliteName)
 //printf("%s\n%s\n",DefaultStationLoc.ID,DefaultStationLoc.Name);
 if((fp=fopen(argv[2],"w+"))==NULL) return 1;
 
+ncount=0;
 for(i=0;i<CloudTraceWindData->SubHeader->TotalPointNumber;i++)
 {
 //		printf("%d\n",i);
-    printf("%i,%i\n",i,CloudTraceWindData->pData[i].Discard);
+    //printf("%i,%i\n",i,CloudTraceWindData->pData[i].Discard);
     if(CloudTraceWindData->pData[i].Discard ==-1 ){
 //        printf("WRITE Report %i .\n",i);
 	DefaultStationLoc.Latitude=float(CloudTraceWindData->pData[i].PointLatitude)/100.0;
@@ -97,9 +99,11 @@ for(i=0;i<CloudTraceWindData->SubHeader->TotalPointNumber;i++)
 	ObsReport->AddMeasure(BlankMeasure);
 	ObsReport->OutputReport(fp);
 	delete ObsReport;
+        ncount++;
     }
 }
 
+printf("Write %i point to file: %s.\n",ncount, argv[2]);
 fclose(fp);
 return 0;
 }

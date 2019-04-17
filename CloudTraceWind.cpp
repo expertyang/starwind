@@ -13,24 +13,40 @@ CLOUDTRACEWINDDATA *data;
 
 bigheader=new STARHEADER;
 subheader=new SCATTERFIELDHEADER;
-printf("size of STARHEADER is: %i\n",sizeof(STARHEADER));
 if((fp=fopen(FileName,"rb"))==NULL) return NULL;
+
+    printf("Read AWX file: %s\n",FileName);
+ 
+    printf("size of STARHEADER is   : %i\n",sizeof(STARHEADER));
+
 //printf("%i\n",ftell(fp));
-	fread(bigheader,sizeof(STARHEADER),1,fp);
-	printf("%i,%i,%i,%i,%i,%i\n", 
-		bigheader->FilledLength,bigheader->RecordLength,bigheader->HeaderUseRecord,bigheader->DataUseRecord,
-		bigheader->CompressType,bigheader->FilledLength);
+    fread(bigheader,sizeof(STARHEADER),1,fp);
+    printf("\tFilled Length   : %i\n"
+           "\tRecord Length   : %i\n"
+           "\tHeaderUseRecord : %i\n"
+           "\tDataUseRecord   : %i\n"
+           "\tCompressType    : %i\n", 
+           bigheader->FilledLength,
+           bigheader->RecordLength,
+           bigheader->HeaderUseRecord,
+           bigheader->DataUseRecord,
+           bigheader->CompressType,
+           bigheader->FilledLength);
+
 if(bigheader->DataType!=4) return NULL;
 //printf("%i\n",ftell(fp));
-	printf("size of SCATTERFIELDHEADER is: %i\n",sizeof(SCATTERFIELDHEADER));
-	fread(subheader,sizeof(SCATTERFIELDHEADER),1,fp);
-	printf("Satellite Name:%s\nStart:%i,%i,%i,%i,%i\nEnd:  %i,%i,%i,%i,%i\nPoint No.: %i\n",
-		subheader->SatelliteName,
-		subheader->StartYear,subheader->StartMonth,subheader->StartDay,
-		subheader->StartHour,subheader->StartMinute,
-		subheader->EndYear,subheader->EndMonth,subheader->EndDay,
-		subheader->EndHour,subheader->EndMinute, 
-		subheader->TotalPointNumber);
+    printf("size of SCATTERFIELDHEADER is : %i\n",sizeof(SCATTERFIELDHEADER));
+    fread(subheader,sizeof(SCATTERFIELDHEADER),1,fp);
+    printf("\tSatellite Name        : %s\n"
+           "\tStart Time            : %i,%i,%i,%i,%i\n"
+           "\tEnd Time              : %i,%i,%i,%i,%i\n"
+           "\tPoint Number          : %i\n",
+           subheader->SatelliteName,
+           subheader->StartYear,subheader->StartMonth,subheader->StartDay,
+           subheader->StartHour,subheader->StartMinute,
+           subheader->EndYear,subheader->EndMonth,subheader->EndDay,
+           subheader->EndHour,subheader->EndMinute, 
+           subheader->TotalPointNumber);
 
 //if(subheader->FieldType!=101 || strcmp(bigheader->FormatDescriptor,"SAT2004") != 0 ) return NULL;
 if(subheader->FieldType!=101) return NULL;
@@ -39,15 +55,16 @@ if(subheader->FieldType!=101) return NULL;
 fseek(fp,bigheader->RecordLength*bigheader->HeaderUseRecord,0);
 //subheader->TotalPointNumber=bigheader->DataUseRecord - bigheader->HeaderUseRecord;
 
-	printf("size of CLOUDTRACEWINDDATA is: %i\n",sizeof(CLOUDTRACEWINDDATA));
+	printf("size of CLOUDTRACEWINDDATA is : %i\n",sizeof(CLOUDTRACEWINDDATA));
 	data=new CLOUDTRACEWINDDATA[subheader->TotalPointNumber];
-	printf("Total Ponit Number is: %i\n", subheader->TotalPointNumber);
+	printf("\tTotal Ponit Number is : %i\n", subheader->TotalPointNumber);
 	for(i=0;i<subheader->TotalPointNumber;i++)
 	{
 		fseek(fp,bigheader->RecordLength*(bigheader->HeaderUseRecord+i),0);
-                printf("%i\n",ftell(fp));
+                // printf("%i\n",ftell(fp));
 		fread(&data[i],sizeof(CLOUDTRACEWINDDATA),1,fp);
 
+                /*
   		printf("Point:%i\n\t Lat: %i Lon: %i\n\t Lev: %i Prs: %i Tmp:%i \n\t Dir: %i Spd: %i\n",
   		i,data[i].PointLatitude, data[i].PointLongitude,
   		data[i].ExploreLevel,
@@ -66,7 +83,7 @@ fseek(fp,bigheader->RecordLength*bigheader->HeaderUseRecord,0);
                 data[i].Reserved[9],
                 data[i].Reserved[10],
                 data[i].Reserved[11],
-                data[i].Discard);
+                data[i].Discard); */
 
 	}
 
